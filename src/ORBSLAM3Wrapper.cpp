@@ -27,32 +27,55 @@ ORBSLAM3Python::ORBSLAM3Python(std::string vocabFile, std::string settingsFile, 
       initFrame(initFrame),
       strSequence(strSequence)
 {
+    system = std::make_shared<ORB_SLAM3::System>(vocabluaryFile, settingsFile, sensorMode, bUseViewer, initFrame, strSequence);
 }
 
 ORBSLAM3Python::~ORBSLAM3Python()
 {
 }
 
-bool ORBSLAM3Python::initialize()
-{
-    system = std::make_shared<ORB_SLAM3::System>(vocabluaryFile, settingsFile, sensorMode, bUseViewer, initFrame, strSequence);
-    return true;
-}
 
-bool ORBSLAM3Python::isRunning()
+bool ORBSLAM3Python::TrackStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> vImuMeas = vector<ORB_SLAM3::IMU::Point>(), std::string filename = "")
 {
-    return system != nullptr;
-}
-
-void ORBSLAM3Python::reset()
-{
-    if (system)
+    if (!system)
     {
-        system->Reset();
+        std::cout << "you must call Initialize() first!" << std::endl;
+        return false;
+    }
+    if (leftImage.data && rightImage.data)
+    {
+
+        // auto pose = system->TrackStereo(leftImage, rightImage, timestamp, imuData, filename);
+        auto pose = system->TrackStereo(leftImage, rightImage, timestamp, vImuMeas, filename);
+        return !system->isLost();
+    }
+    else
+    {
+        return false;
     }
 }
 
-bool ORBSLAM3Python::processMono(cv::Mat image, double timestamp, std::vector<ORB_SLAM3::IMU::Point> vImuMeas = std::vector<ORB_SLAM3::IMU::Point>(), std::string filename = "")
+
+bool ORBSLAM3Python::TrackRGBD(cv::Mat image, cv::Mat depthImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> vImuMeas = vector<ORB_SLAM3::IMU::Point>(), std::string filename = "")
+{
+    if (!system)
+    {
+        std::cout << "you must call Initialize() first!" << std::endl;
+        return false;
+    }
+    if (image.data && depthImage.data)
+    {
+        auto pose = system->TrackRGBD(image, depthImage, timestamp, vImuMeas, filename);
+        return !system->isLost();
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
+bool ORBSLAM3Python::TrackMonocular(cv::Mat image, double timestamp, std::vector<ORB_SLAM3::IMU::Point> vImuMeas = std::vector<ORB_SLAM3::IMU::Point>(), std::string filename = "")
 {
     if (!system)
     {
@@ -69,51 +92,64 @@ bool ORBSLAM3Python::processMono(cv::Mat image, double timestamp, std::vector<OR
     }
 }
 
-bool ORBSLAM3Python::processStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> vImuMeas = vector<ORB_SLAM3::IMU::Point>(), std::string filename = "")
-{
-    if (!system)
-    {
-        std::cout << "you must call initialize() first!" << std::endl;
-        return false;
-    }
-    if (leftImage.data && rightImage.data)
-    {
 
-        // auto pose = system->TrackStereo(leftImage, rightImage, timestamp, imuData, filename);
-        auto pose = system->TrackStereo(leftImage, rightImage, timestamp, vImuMeas, filename);
-        return !system->isLost();
-    }
-    else
+void ORBSLAM3Python::ActivateLocalizationMode()
+{
+    if (system)
     {
-        return false;
+        system->ActivateLocalizationMode();
     }
 }
 
-bool ORBSLAM3Python::processRGBD(cv::Mat image, cv::Mat depthImage, double timestamp)
+
+void ORBSLAM3Python::DeactivateLocalizationMode()
 {
-    if (!system)
+    if (system)
     {
-        std::cout << "you must call initialize() first!" << std::endl;
-        return false;
-    }
-    if (image.data && depthImage.data)
-    {
-        auto pose = system->TrackRGBD(image, depthImage, timestamp);
-        return !system->isLost();
-    }
-    else
-    {
-        return false;
+        system->DeactivateLocalizationMode();
     }
 }
 
-void ORBSLAM3Python::shutdown()
+bool ORBSLAM3Python::MapChanged()
+{
+    if (system)
+    {
+        return system->MapChanged();
+    }
+    return false;
+}
+
+void ORBSLAM3Python::Reset()
+{
+    if (system)
+    {
+        system->Reset();
+    }
+}
+
+
+void ORBSLAM3Python::ResetActiveMap()
+{
+    if (system)
+    {
+        system->ResetActiveMap();
+    }
+}
+
+
+void ORBSLAM3Python::Shutdown()
 {
     if (system)
     {
         system->Shutdown();
     }
 }
+
+bool ORBSLAM3Python::isRunning()
+{
+    return system != nullptr;
+}
+
 
 void ORBSLAM3Python::setUseViewer(bool useViewer)
 {
@@ -125,15 +161,77 @@ std::vector<Eigen::Matrix4f> ORBSLAM3Python::getTrajectory() const
     return system->GetCameraTrajectory();
 }
 
-// void ORBSLAM3Python::testfunc(ORB_SLAM3::IMU::Point imuData)
-// {
-//     std::cout << "a.x: " << imuData.a.x() << " a.y: " << imuData.a.y() << " a.z: " << imuData.a.z() << std::endl;
-// }
 
-// void ORBSLAM3Python::testfunc2(cv::Point3f p)
-// {
-//     std::cout << "x: " << p.x << " y: " << p.y << " z: " << p.z << std::endl;
-// }
+void ORBSLAM3Python::SaveTrajectoryTUM(const std::string &filename)
+{
+    system->SaveTrajectoryTUM(filename);
+}
+
+
+void ORBSLAM3Python::SaveKeyFrameTrajectoryTUM(const std::string &filename)
+{
+    system->SaveKeyFrameTrajectoryTUM(filename);
+}
+
+void ORBSLAM3Python::SaveTrajectoryEuRoC(const std::string &filename)
+{
+    system->SaveTrajectoryEuRoC(filename);
+}
+
+void ORBSLAM3Python::SaveKeyFrameTrajectoryEuRoC(const std::string &filename)
+{
+    system->SaveKeyFrameTrajectoryEuRoC(filename);
+}
+
+void ORBSLAM3Python::SaveDebugData(const int &iniIdx)
+{
+    system->SaveDebugData(iniIdx);
+}
+
+void ORBSLAM3Python::SaveTrajectoryKitti(const std::string &filename)
+{
+    system->SaveTrajectoryKITTI(filename);
+}
+
+int ORBSLAM3Python::GetTrackingState()
+{
+    return system->GetTrackingState();
+}
+
+double ORBSLAM3Python::GetTimeFromIMUInit()
+{
+    return system->GetTimeFromIMUInit();
+}
+
+bool ORBSLAM3Python::isLost()
+{
+    return system->isLost();
+}
+
+bool ORBSLAM3Python::isFinished()
+{
+    return system->isFinished();
+}
+
+void ORBSLAM3Python::ChangeDataset()
+{
+    system->ChangeDataset();
+}
+
+float ORBSLAM3Python::GetImageScale()
+{
+    return system->GetImageScale();
+}
+
+void ORBSLAM3Python::testfunc(ORB_SLAM3::IMU::Point imuData)
+{
+    std::cout << "a.x: " << imuData.a.x() << " a.y: " << imuData.a.y() << " a.z: " << imuData.a.z() << std::endl;
+}
+
+void ORBSLAM3Python::testfunc2(cv::Point3f p)
+{
+    std::cout << "x: " << p.x << " y: " << p.y << " z: " << p.z << std::endl;
+}
 
 
 
@@ -169,6 +267,12 @@ PYBIND11_MODULE(orbslam3, m)
         .value("IMU_STEREO", ORB_SLAM3::System::eSensor::IMU_STEREO)
         .value("IMU_RGBD", ORB_SLAM3::System::eSensor::IMU_RGBD);
 
+
+    py::enum_<ORB_SLAM3::System::FileType>(m, "FileType")
+        .value("TEXT_FILE", ORB_SLAM3::System::FileType::TEXT_FILE)
+        .value("BINARY_FILE", ORB_SLAM3::System::FileType::BINARY_FILE);
+
+
     py::class_<ORB_SLAM3::IMU::Point>(m, "Point")
         .def(py::init<const cv::Point3f &, const cv::Point3f &, const double &>())
         .def(py::init<const float &, const float &, const float &, const float &, const float &, const float &, const double &>())
@@ -178,21 +282,59 @@ PYBIND11_MODULE(orbslam3, m)
 
 
     py::class_<ORBSLAM3Python>(m, "system")
+
         .def(py::init<std::string, std::string, ORB_SLAM3::System::eSensor, bool, int, std::string>(), py::arg("vocab_file"), py::arg("settings_file"), py::arg("sensor_type"), py::arg("use_viewer") = false, py::arg("init_frame") = 0, py::arg("sequence") = std::string())
 
-        .def("initialize", &ORBSLAM3Python::initialize)
 
-        .def("process_image_mono", &ORBSLAM3Python::processMono, py::arg("image"), py::arg("timestamp"), py::arg("vImuMeas")=std::vector<ORB_SLAM3::IMU::Point>(), py::arg("filename") = std::string())
+        .def("process_image_stereo", &ORBSLAM3Python::TrackStereo, py::arg("leftImage"), py::arg("rightimage"), py::arg("timestamp"), py::arg("vImuMeas"), py::arg("filename") = std::string())
 
-        .def("process_image_stereo", &ORBSLAM3Python::processStereo, py::arg("leftImage"), py::arg("rightimage"), py::arg("timestamp"), py::arg("vImuMeas"), py::arg("filename") = std::string())
+        .def("process_image_rgbd", &ORBSLAM3Python::TrackRGBD, py::arg("image"), py::arg("depth"), py::arg("time_stamp"), py::arg("vImuMeas")=std::vector<ORB_SLAM3::IMU::Point>(), py::arg("filename") = std::string())
 
-        .def("process_image_rgbd", &ORBSLAM3Python::processRGBD, py::arg("image"), py::arg("depth"), py::arg("time_stamp"))
 
-        .def("shutdown", &ORBSLAM3Python::shutdown)
+        .def("process_image_mono", &ORBSLAM3Python::TrackMonocular, py::arg("image"), py::arg("timestamp"), py::arg("vImuMeas")=std::vector<ORB_SLAM3::IMU::Point>(), py::arg("filename") = std::string())
+
+        .def("activate_localization_mode", &ORBSLAM3Python::ActivateLocalizationMode)
+
+        .def("deactivate_localization_mode", &ORBSLAM3Python::DeactivateLocalizationMode)
+
+        .def("map_changed", &ORBSLAM3Python::MapChanged)
+
+        .def("reset", &ORBSLAM3Python::Reset)
+
+        .def("reset_active_map", &ORBSLAM3Python::ResetActiveMap)
+
+        .def("shutdown", &ORBSLAM3Python::Shutdown)
+
         .def("is_running", &ORBSLAM3Python::isRunning)
-        .def("reset", &ORBSLAM3Python::reset)
+        
         .def("set_use_viewer", &ORBSLAM3Python::setUseViewer)
-        .def("get_trajectory", &ORBSLAM3Python::getTrajectory);
-        // .def("testfunc", &ORBSLAM3Python::testfunc)
-        // .def("testfunc2", &ORBSLAM3Python::testfunc2);
+
+        .def("get_trajectory", &ORBSLAM3Python::getTrajectory)
+        
+        .def("save_trajectory_tum", &ORBSLAM3Python::SaveTrajectoryTUM, py::arg("filename"))
+        
+        .def("save_keyframe_trajectory_tum", &ORBSLAM3Python::SaveKeyFrameTrajectoryTUM, py::arg("filename"))
+
+        .def("save_trajectory_euroc", &ORBSLAM3Python::SaveTrajectoryEuRoC, py::arg("filename"))
+        
+        .def("save_keyframe_trajectory_euroc", &ORBSLAM3Python::SaveKeyFrameTrajectoryEuRoC, py::arg("filename"))
+
+        .def("save_debug_data", &ORBSLAM3Python::SaveDebugData, py::arg("iniIdx"))
+
+        .def("save_trajectory_kitti", &ORBSLAM3Python::SaveTrajectoryKitti, py::arg("filename"))
+
+        .def("get_tracking_state", &ORBSLAM3Python::GetTrackingState)
+
+        .def("get_time_from_imu_init", &ORBSLAM3Python::GetTimeFromIMUInit)
+
+        .def("is_lost", &ORBSLAM3Python::isLost)
+
+        .def("is_finished", &ORBSLAM3Python::isFinished)
+
+        .def("change_dataset", &ORBSLAM3Python::ChangeDataset)
+
+        .def("get_image_scale", &ORBSLAM3Python::GetImageScale)
+
+        .def("testfunc", &ORBSLAM3Python::testfunc)
+        .def("testfunc2", &ORBSLAM3Python::testfunc2);
 }

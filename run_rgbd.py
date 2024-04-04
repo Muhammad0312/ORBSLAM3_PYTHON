@@ -12,22 +12,23 @@ parser.add_argument("--dataset_path", required=True)
 args = parser.parse_args()
 
 img_files = sorted(glob(os.path.join(args.dataset_path, 'rgb/*.png')))
-slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.MONOCULAR)
-slam.set_use_viewer(False)
+slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.MONOCULAR, False)
+
+print(type(args.vocab_file))
+print(type(args.settings_file))
+print(type(orbslam3.Sensor.MONOCULAR))
+print("SLAM object created")
+
+# slam.set_use_viewer(False)
 # slam.initialize()
 
-a = orbslam3.Point3f(1, 2, 3)
-b = orbslam3.Point3f(4, 5, 6)
-t = 10
-
-p = orbslam3.Point(a, b, t)
-slam.testfunc(p)
+# slam.testfunc2(orbslam3.Point3f(1.0,2.0,3.0))
 
 # for img in img_files:
 #     timestamp = img.split('/')[-1][:-4]
 #     img = cv2.imread(img, -1)
 #     pose = slam.process_image_mono(img, float(timestamp))
-#     print(pose)
+#     # print(pose)
 
 # print(slam.get_trajectory())
 
