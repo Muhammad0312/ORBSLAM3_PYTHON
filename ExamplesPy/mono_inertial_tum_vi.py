@@ -55,13 +55,15 @@ firstImu -= 1
 slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.IMU_MONOCULAR, False)
 imageScale = slam.get_image_scale()
 
+clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+
 
 for i in range(len(imgFiles)):
-    # print("Processing: ", i)
+    print("Processing: ", i)
     vImuMeas = []
     startTime = time.time()
     currentTimestamp = timeStamps[i]
-    img = cv2.imread(imgFiles[i], cv2.IMREAD_UNCHANGED)
+    img = cv2.imread(imgFiles[i], cv2.IMREAD_GRAYSCALE)
     if img is None:
         print("Failed to load image at path: ", img)
         break
@@ -75,6 +77,8 @@ for i in range(len(imgFiles)):
         while imuTimeStamps[firstImu] <= currentTimestamp:
             vImuMeas.append(orbslam3.Point(accData[firstImu].x, accData[firstImu].y, accData[firstImu].z, gyroData[firstImu].x, gyroData[firstImu].y, gyroData[firstImu].z, imuTimeStamps[firstImu]))
             firstImu += 1
+
+    img = clahe.apply(img)
 
     pose = slam.process_image_mono(img, currentTimestamp, vImuMeas)
     endTime = time.time()
@@ -102,4 +106,4 @@ else:
 
 
 # Run the script with the following command:
-# python3 ExamplesPy/mono_inertial_euroc.py --vocab_file=extern/ORB_SLAM3/Vocabulary/ORBvoc.txt --settings_file=extern/ORB_SLAM3/Examples/Monocular-Inertial/EuRoC.yaml --dataset_path=/root/Datasets/EuRoc/MH01 --times_path=extern/ORB_SLAM3/Examples/Monocular-Inertial/EuRoC_TimeStamps/MH01.txt
+# python3 ExamplesPy/mono_inertial_tum_vi.py --vocab_file=extern/ORB_SLAM3/Vocabulary/ORBvoc.txt --settings_file=extern/ORB_SLAM3/Examples/Monocular-Inertial/TUM-VI.yaml --dataset_path=/root/Datasets/TUM_VI/dataset-corridor1_512_16 --times_path=extern/ORB_SLAM3/Examples/Monocular-Inertial/TUM_TimeStamps/dataset-corridor1_512.txt

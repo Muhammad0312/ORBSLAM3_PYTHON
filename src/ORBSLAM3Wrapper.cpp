@@ -39,7 +39,7 @@ bool ORBSLAM3Python::TrackStereo(cv::Mat leftImage, cv::Mat rightImage, double t
 {
     if (!system)
     {
-        std::cout << "you must call Initialize() first!" << std::endl;
+        std::cout << "System not Initialized" << std::endl;
         return false;
     }
     if (leftImage.data && rightImage.data)
@@ -60,7 +60,7 @@ bool ORBSLAM3Python::TrackRGBD(cv::Mat image, cv::Mat depthImage, double timesta
 {
     if (!system)
     {
-        std::cout << "you must call Initialize() first!" << std::endl;
+        std::cout << "Syatem not initialized" << std::endl;
         return false;
     }
     if (image.data && depthImage.data)
@@ -79,6 +79,7 @@ bool ORBSLAM3Python::TrackMonocular(cv::Mat image, double timestamp, std::vector
 {
     if (!system)
     {
+        std::cout << "System not initialized" << std::endl;
         return false;
     }
     if (image.data)
@@ -286,7 +287,7 @@ PYBIND11_MODULE(orbslam3, m)
         .def(py::init<std::string, std::string, ORB_SLAM3::System::eSensor, bool, int, std::string>(), py::arg("vocab_file"), py::arg("settings_file"), py::arg("sensor_type"), py::arg("use_viewer") = false, py::arg("init_frame") = 0, py::arg("sequence") = std::string())
 
 
-        .def("process_image_stereo", &ORBSLAM3Python::TrackStereo, py::arg("leftImage"), py::arg("rightimage"), py::arg("timestamp"), py::arg("vImuMeas"), py::arg("filename") = std::string())
+        .def("process_image_stereo", &ORBSLAM3Python::TrackStereo, py::arg("leftImage"), py::arg("rightimage"), py::arg("timestamp"), py::arg("vImuMeas")=std::vector<ORB_SLAM3::IMU::Point>(), py::arg("filename") = std::string())
 
         .def("process_image_rgbd", &ORBSLAM3Python::TrackRGBD, py::arg("image"), py::arg("depth"), py::arg("time_stamp"), py::arg("vImuMeas")=std::vector<ORB_SLAM3::IMU::Point>(), py::arg("filename") = std::string())
 

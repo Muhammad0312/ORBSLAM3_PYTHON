@@ -20,14 +20,15 @@ parser.add_argument("--output_path", required=False, help="Output trajectory fil
 args = parser.parse_args()
 
 # Load the images
-imgFiles = sorted(glob(os.path.join(args.dataset_path, 'mav0/cam0/data/*.png')))
+imgFilesLeft = sorted(glob(os.path.join(args.dataset_path, 'mav0/cam0/data/*.png')))
+
+imgFilesRight = sorted(glob(os.path.join(args.dataset_path, 'mav0/cam1/data/*.png')))
 
 # Load the timestamps
 timeStamps = []
 with open(args.times_path, 'r') as f:
     for line in f:
         timeStamps.append(int(line.split()[0])*1e-9)
-
 
 
 imuFile = os.path.join(args.dataset_path, 'mav0/imu0/data.csv')
@@ -52,31 +53,37 @@ while imuTimeStamps[firstImu] <= timeStamps[0]:
 firstImu -= 1
 
 
-slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.IMU_MONOCULAR, False)
+slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.IMU_STEREO, False)
 imageScale = slam.get_image_scale()
 
 
-for i in range(len(imgFiles)):
-    # print("Processing: ", i)
+
+for i in range(len(imgFilesLeft)):
+    print("Processing: ", i)
     vImuMeas = []
     startTime = time.time()
     currentTimestamp = timeStamps[i]
-    img = cv2.imread(imgFiles[i], cv2.IMREAD_UNCHANGED)
-    if img is None:
-        print("Failed to load image at path: ", img)
+    imgLeft = cv2.imread(imgFilesLeft[i], cv2.IMREAD_UNCHANGED)
+    imgRight = cv2.imread(imgFilesRight[i], cv2.IMREAD_UNCHANGED)
+    if imgLeft is None:
+        print("Failed to load image at path: ", imgLeft)
+        break
+    if imgRight is None:
+        print("Failed to load image at path: ", imgRight)
         break
 
     if imageScale != 1.0:
-        width = img.cols * imageScale
-        height = img.rows * imageScale
-        img = cv2.resize(img, (width, height))
+        width = imgLeft.cols * imageScale
+        height = imgLeft.rows * imageScale
+        imgLeft = cv2.resize(imgLeft, (width, height))
+        imgRight = cv2.resize(imgRight, (width, height))
 
     if i > 0:
         while imuTimeStamps[firstImu] <= currentTimestamp:
             vImuMeas.append(orbslam3.Point(accData[firstImu].x, accData[firstImu].y, accData[firstImu].z, gyroData[firstImu].x, gyroData[firstImu].y, gyroData[firstImu].z, imuTimeStamps[firstImu]))
             firstImu += 1
 
-    pose = slam.process_image_mono(img, currentTimestamp, vImuMeas)
+    pose = slam.process_image_stereo(imgLeft, imgRight, currentTimestamp, vImuMeas)
     endTime = time.time()
 
     # If processing is faster than real-time, sleep for a while
@@ -102,4 +109,4 @@ else:
 
 
 # Run the script with the following command:
-# python3 ExamplesPy/mono_inertial_euroc.py --vocab_file=extern/ORB_SLAM3/Vocabulary/ORBvoc.txt --settings_file=extern/ORB_SLAM3/Examples/Monocular-Inertial/EuRoC.yaml --dataset_path=/root/Datasets/EuRoc/MH01 --times_path=extern/ORB_SLAM3/Examples/Monocular-Inertial/EuRoC_TimeStamps/MH01.txt
+# python3 ExamplesPy/stereo_inertial_euroc.py --vocab_file=extern/ORB_SLAM3/Vocabulary/ORBvoc.txt --settings_file=extern/ORB_SLAM3/Examples/Stereo-Inertial/EuRoC.yaml --dataset_path=/root/Datasets/EuRoc/MH01 --times_path=extern/ORB_SLAM3/Examples/Stereo-Inertial/EuRoC_TimeStamps/MH01.txt
