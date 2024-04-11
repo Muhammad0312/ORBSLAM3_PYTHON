@@ -33,6 +33,7 @@ imageScale = slam.get_image_scale()
 
 
 for i in range(len(imgFiles)):
+    print("Processing: ", i)
     startTime = time.time()
     currentTimestamp = timeStamps[i]
     img = cv2.imread(imgFiles[i], cv2.IMREAD_UNCHANGED)
@@ -46,6 +47,14 @@ for i in range(len(imgFiles)):
         img = cv2.resize(img, (width, height))
 
     pose = slam.process_image_mono(img, currentTimestamp)
+    state = slam.get_tracking_state()
+    if(state != orbslam3.TrackingState.OK):
+        print("System not ready yet")
+    if(state == orbslam3.TrackingState.OK):
+        # print("System OK")
+        allMapPoints = slam.get_map_points()
+        currentMapPoints = slam.get_current_map_points()
+    
     endTime = time.time()
 
     # If processing is faster than real-time, sleep for a while

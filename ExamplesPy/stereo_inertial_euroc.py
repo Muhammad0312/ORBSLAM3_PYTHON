@@ -84,6 +84,12 @@ for i in range(len(imgFilesLeft)):
             firstImu += 1
 
     pose = slam.process_image_stereo(imgLeft, imgRight, currentTimestamp, vImuMeas)
+    state = slam.get_tracking_state()
+    if(state != orbslam3.TrackingState.OK):
+        print("System not ready yet")
+    
+    allMapPoints = slam.get_map_points()
+    currentMapPoints = slam.get_current_map_points()
     endTime = time.time()
 
     # If processing is faster than real-time, sleep for a while

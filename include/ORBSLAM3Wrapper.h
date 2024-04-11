@@ -29,8 +29,6 @@ public:
     void Shutdown();
     bool isRunning();
     void setUseViewer(bool useViewer);
-    std::vector<Eigen::Matrix4f> getTrajectory() const;
-
 
     void SaveTrajectoryTUM(const std::string &filename);
     void SaveKeyFrameTrajectoryTUM(const string &filename);
@@ -49,6 +47,13 @@ public:
 
     // std::vector<MapPoint*> GetTrackedMapPoints();
     // std::vector<cv::KeyPoint> GetTrackedKeyPointsUn();
+    std::vector<Eigen::Matrix4f> GetTrajectory() const;
+
+    std::vector<Eigen::Matrix4f> GetFullTrajectory() const;
+
+    vector<Eigen::Matrix<float,3,1>> GetMapPoints();
+
+    vector<Eigen::Matrix<float,3,1>> GetCurrentMapPoints();
 
     double GetTimeFromIMUInit();
     bool isLost();

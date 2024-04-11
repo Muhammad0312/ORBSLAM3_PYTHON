@@ -157,12 +157,6 @@ void ORBSLAM3Python::setUseViewer(bool useViewer)
     bUseViewer = useViewer;
 }
 
-std::vector<Eigen::Matrix4f> ORBSLAM3Python::getTrajectory() const
-{
-    return system->GetCameraTrajectory();
-}
-
-
 void ORBSLAM3Python::SaveTrajectoryTUM(const std::string &filename)
 {
     system->SaveTrajectoryTUM(filename);
@@ -197,6 +191,24 @@ void ORBSLAM3Python::SaveTrajectoryKitti(const std::string &filename)
 int ORBSLAM3Python::GetTrackingState()
 {
     return system->GetTrackingState();
+}
+
+std::vector<Eigen::Matrix4f> ORBSLAM3Python::GetTrajectory() const
+{
+    return system->GetCameraTrajectory();
+}
+
+std::vector<Eigen::Matrix4f> ORBSLAM3Python::GetFullTrajectory() const
+{
+    return system->GetFullTrajectory();
+}
+
+vector<Eigen::Matrix<float,3,1>> ORBSLAM3Python::GetMapPoints(){
+    return system->GetMapPoints();
+}
+
+vector<Eigen::Matrix<float,3,1>> ORBSLAM3Python::GetCurrentMapPoints(){
+    return system->GetCurrentMapPoints();
 }
 
 double ORBSLAM3Python::GetTimeFromIMUInit()
@@ -309,8 +321,6 @@ PYBIND11_MODULE(orbslam3, m)
         .def("is_running", &ORBSLAM3Python::isRunning)
         
         .def("set_use_viewer", &ORBSLAM3Python::setUseViewer)
-
-        .def("get_trajectory", &ORBSLAM3Python::getTrajectory)
         
         .def("save_trajectory_tum", &ORBSLAM3Python::SaveTrajectoryTUM, py::arg("filename"))
         
@@ -325,6 +335,14 @@ PYBIND11_MODULE(orbslam3, m)
         .def("save_trajectory_kitti", &ORBSLAM3Python::SaveTrajectoryKitti, py::arg("filename"))
 
         .def("get_tracking_state", &ORBSLAM3Python::GetTrackingState)
+
+        .def("get_trajectory", &ORBSLAM3Python::GetTrajectory)
+
+        .def("get_full_trajectory", &ORBSLAM3Python::GetFullTrajectory)
+
+        .def("get_map_points", &ORBSLAM3Python::GetMapPoints)
+
+        .def("get_current_map_points", &ORBSLAM3Python::GetCurrentMapPoints)
 
         .def("get_time_from_imu_init", &ORBSLAM3Python::GetTimeFromIMUInit)
 

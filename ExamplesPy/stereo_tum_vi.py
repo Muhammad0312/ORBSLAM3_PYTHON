@@ -65,6 +65,13 @@ for i in range(len(imgFilesLeft)):
     imgRight = clahe.apply(imgRight)
 
     pose = slam.process_image_stereo(imgLeft, imgRight, currentTimestamp)
+    state = slam.get_tracking_state()
+    if(state != orbslam3.TrackingState.OK):
+        print("System not ready yet")
+    
+    # allMapPoints = slam.get_map_points()
+    # currentMapPoints = slam.get_current_map_points()
+    # slam.get_full_trajectory()
     endTime = time.time()
 
     # If processing is faster than real-time, sleep for a while
@@ -77,6 +84,8 @@ for i in range(len(imgFilesLeft)):
     processingTime = endTime - startTime
     if processingTime < frameTime:
         time.sleep(frameTime - processingTime)
+    else:
+        print("Processing time exceeded time between frames: ", processingTime - frameTime)
 
 slam.shutdown()
 

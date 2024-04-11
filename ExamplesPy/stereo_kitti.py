@@ -35,7 +35,7 @@ slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.STER
 imageScale = slam.get_image_scale()
 
 for i in range(len(imgFilesLeft)):
-    print("Processing Frame: ", i)
+    # print("Processing Frame: ", i)
     startTime = time.time()
     currentTimestamp = timeStamps[i]
     imgLeft = cv2.imread(imgFilesLeft[i], cv2.IMREAD_UNCHANGED)
@@ -56,6 +56,13 @@ for i in range(len(imgFilesLeft)):
         imgRight = cv2.resize(imgRight, (width, height))
 
     pose = slam.process_image_stereo(imgLeft, imgRight, currentTimestamp)
+    state = slam.get_tracking_state()
+    if(state != orbslam3.TrackingState.OK):
+        print("System not ready yet")
+    
+    allMapPoints = slam.get_map_points()
+    currentMapPoints = slam.get_current_map_points()
+    slam.get_full_trajectory()
     endTime = time.time()
 
     # If processing is faster than real-time, sleep for a while
@@ -67,7 +74,10 @@ for i in range(len(imgFilesLeft)):
     frameTime = (nextTimestamp - currentTimestamp)
     processingTime = endTime - startTime
     if processingTime < frameTime:
+        print("Sleeping for: ", frameTime - processingTime)
         time.sleep(frameTime - processingTime)
+    else:
+        print("Processing Time Exceeded Frame Time")
 
 slam.shutdown()
 
