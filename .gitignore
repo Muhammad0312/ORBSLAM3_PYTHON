@@ -23,3 +23,7 @@ build/
 misc/*
 
 lib/*
+
+dist/
+
+orbslam3.egg-info/

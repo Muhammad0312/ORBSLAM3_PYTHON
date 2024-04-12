@@ -8,7 +8,6 @@ LIST(APPEND CMAKE_MODULE_PATH
 add_subdirectory(extern/pybind11)
 add_subdirectory(extern/ORB_SLAM3)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
 pybind11_add_module(orbslam3 
     src/ORBSLAM3Wrapper.cpp

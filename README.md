@@ -5,8 +5,8 @@ Examples are provided in the ExamplesPy folder
 
 Each script has the command to run the script at the end, adjust paths accordingly
 
-Build the project in release mode to avoid issues from ORBSLAM3
+To build and install the package globally
 
-Add the path to lib folder to PYTHONPATH variable
+python3 setup.py install
 
 

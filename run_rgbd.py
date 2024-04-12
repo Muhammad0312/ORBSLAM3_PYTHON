@@ -1,4 +1,4 @@
-from lib import orbslam3
+import orbslam3
 import argparse
 from glob import glob
 import os 

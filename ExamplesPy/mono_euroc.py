@@ -6,8 +6,6 @@ import cv2
 import time
 import pdb
 
-# Add the path to lib folder to PYTHONPATH
-
 import orbslam3
 
 parser = argparse.ArgumentParser()
