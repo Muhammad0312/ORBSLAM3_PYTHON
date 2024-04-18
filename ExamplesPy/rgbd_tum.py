@@ -87,4 +87,4 @@ else:
 
 
 # Run the script with the following command:
-# python3 ExamplesPy/rgbd_tum.py --vocab_file=extern/ORB_SLAM3/Vocabulary/ORBvoc.txt --settings_file=extern/ORB_SLAM3/Examples/RGB-D/TUM1.yaml --dataset_path=/root/Datasets/TUM/rgbd_dataset_freiburg1_xyz --association_path=extern/ORB_SLAM3/Examples/RGB-D/associations/fr1_xyz.txt
+# python3 ExamplesPy/rgbd_tum.py --vocab_file=extern/ORB_SLAM3/Vocabulary/ORBvoc.txt --settings_file=extern/ORB_SLAM3/Examples/RGB-D/TUM1.yaml --dataset_path=/root/Datasets/TUM/rgbd_dataset_freiburg1_desk --association_path=extern/ORB_SLAM3/Examples/RGB-D/associations/fr1_desk.txt

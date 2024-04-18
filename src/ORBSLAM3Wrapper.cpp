@@ -23,7 +23,7 @@ ORBSLAM3Python::ORBSLAM3Python(std::string vocabFile, std::string settingsFile, 
       settingsFile(settingsFile),
       sensorMode(sensorMode),
       system(nullptr),
-      bUseViewer(false),
+      bUseViewer(useViewer),
       initFrame(initFrame),
       strSequence(strSequence)
 {
