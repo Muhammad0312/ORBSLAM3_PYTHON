@@ -29,7 +29,6 @@ with open(args.times_path, 'r') as f:
 slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.MONOCULAR, False)
 imageScale = slam.get_image_scale()
 
-
 for i in range(len(imgFiles)):
     print("Processing: ", i)
     startTime = time.time()
@@ -52,7 +51,7 @@ for i in range(len(imgFiles)):
         # print("System OK")
         allMapPoints = slam.get_map_points()
         currentMapPoints = slam.get_current_map_points()
-    
+        pdb.set_trace()    
     endTime = time.time()
 
     # If processing is faster than real-time, sleep for a while

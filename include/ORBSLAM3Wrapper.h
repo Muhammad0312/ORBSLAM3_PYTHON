@@ -51,9 +51,17 @@ public:
 
     std::vector<Eigen::Matrix4f> GetFullTrajectory() const;
 
-    vector<Eigen::Matrix<float,3,1>> GetMapPoints();
+    vector<Eigen::Matrix<float,7,1>> GetMapPoints();
 
-    vector<Eigen::Matrix<float,3,1>> GetCurrentMapPoints();
+    vector<Eigen::Matrix<float,7,1>> GetCurrentMapPoints();
+
+    int GetNumKeyFrames();
+
+    std::vector<std::vector<int>> GetKeyFrameIds();
+
+    std::vector<int> GetCovisibleFrameIds(int KeyFrameId, int NumKeyFrames);
+
+    int GetLatestKeyFrameId();
 
     double GetTimeFromIMUInit();
     bool isLost();

@@ -81,8 +81,10 @@ for i in range(len(imgFiles)):
 slam.shutdown()
 
 if args.output_path:
+    slam.save_trajectory_tum(args.output_path + ".txt")
     slam.save_keyframe_trajectory_tum(args.output_path + "_keyframe.txt")
 else:
+    slam.save_trajectory_tum("CameraTrajectory.txt")
     slam.save_keyframe_trajectory_tum("KeyFrameTrajectory.txt")
 
 

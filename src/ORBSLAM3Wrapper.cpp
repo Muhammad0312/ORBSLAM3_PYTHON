@@ -203,12 +203,31 @@ std::vector<Eigen::Matrix4f> ORBSLAM3Python::GetFullTrajectory() const
     return system->GetFullTrajectory();
 }
 
-vector<Eigen::Matrix<float,3,1>> ORBSLAM3Python::GetMapPoints(){
+vector<Eigen::Matrix<float,7,1>> ORBSLAM3Python::GetMapPoints(){
     return system->GetMapPoints();
 }
 
-vector<Eigen::Matrix<float,3,1>> ORBSLAM3Python::GetCurrentMapPoints(){
+vector<Eigen::Matrix<float,7,1>> ORBSLAM3Python::GetCurrentMapPoints(){
     return system->GetCurrentMapPoints();
+}
+
+int ORBSLAM3Python::GetNumKeyFrames()
+{
+    return system->GetNumKeyFrames();
+}
+
+std::vector<std::vector<int>> ORBSLAM3Python::GetKeyFrameIds()
+{
+    return system->GetKeyFrameIds();
+}
+
+std::vector<int> ORBSLAM3Python::GetCovisibleFrameIds(int KeyFrameId, int NumKeyFrames){
+    return system->GetCovisibleKeyFrames(KeyFrameId, NumKeyFrames);
+}
+
+int ORBSLAM3Python::GetLatestKeyFrameId()
+{
+    return system->GetLatestKeyFrameId();
 }
 
 double ORBSLAM3Python::GetTimeFromIMUInit()
@@ -343,6 +362,14 @@ PYBIND11_MODULE(orbslam3, m)
         .def("get_map_points", &ORBSLAM3Python::GetMapPoints)
 
         .def("get_current_map_points", &ORBSLAM3Python::GetCurrentMapPoints)
+
+        .def("get_num_keyframes", &ORBSLAM3Python::GetNumKeyFrames)
+
+        .def("get_keyframe_ids", &ORBSLAM3Python::GetKeyFrameIds)
+
+        .def("get_covisible_frame_ids", &ORBSLAM3Python::GetCovisibleFrameIds, py::arg("KeyFrameId"), py::arg("NumKeyFrames"))
+
+        .def("get_latest_keyframe_id", &ORBSLAM3Python::GetLatestKeyFrameId)
 
         .def("get_time_from_imu_init", &ORBSLAM3Python::GetTimeFromIMUInit)
 
