@@ -71,6 +71,8 @@ public:
 
     float GetImageScale();
 
+    bool isKeyFrame();
+
     void testfunc(ORB_SLAM3::IMU::Point imuData);
     void testfunc2(cv::Point3f p);
 

@@ -255,6 +255,11 @@ float ORBSLAM3Python::GetImageScale()
     return system->GetImageScale();
 }
 
+bool ORBSLAM3Python::isKeyFrame()
+{
+    return system->isKeyFrame();
+}
+
 void ORBSLAM3Python::testfunc(ORB_SLAM3::IMU::Point imuData)
 {
     std::cout << "a.x: " << imuData.a.x() << " a.y: " << imuData.a.y() << " a.z: " << imuData.a.z() << std::endl;
@@ -380,6 +385,8 @@ PYBIND11_MODULE(orbslam3, m)
         .def("change_dataset", &ORBSLAM3Python::ChangeDataset)
 
         .def("get_image_scale", &ORBSLAM3Python::GetImageScale)
+
+        .def("is_keyframe", &ORBSLAM3Python::isKeyFrame)
 
         .def("testfunc", &ORBSLAM3Python::testfunc)
         .def("testfunc2", &ORBSLAM3Python::testfunc2);

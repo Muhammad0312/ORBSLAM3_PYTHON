@@ -55,6 +55,11 @@ for i in range(len(imgFiles)):
         img = cv2.resize(img, (width, height))
 
     pose = slam.process_image_mono(img, currentTimestamp)
+    isKeyframe = slam.is_keyframe()
+    if isKeyframe:
+        print("KeyFrame detected at frame: ", i)
+        numPoints = len(slam.get_current_map_points())
+        print("Number of points in the keyframe: ", numPoints)
     endTime = time.time()
 
     # If processing is faster than real-time, sleep for a while
