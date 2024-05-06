@@ -30,7 +30,7 @@ with open(timeStampsFile, 'r') as f:
         timeStamps.append(double(line.split()[0]))
 
 
-slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.MONOCULAR, False)
+slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.MONOCULAR, True)
 imageScale = slam.get_image_scale()
 
 for i in range(len(imgFiles)):

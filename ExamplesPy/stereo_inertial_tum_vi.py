@@ -53,7 +53,7 @@ while imuTimeStamps[firstImu] <= timeStamps[0]:
 firstImu -= 1
 
 
-slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.IMU_STEREO, False)
+slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.IMU_STEREO, True)
 imageScale = slam.get_image_scale()
 
 clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))

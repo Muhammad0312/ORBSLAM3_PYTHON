@@ -34,7 +34,7 @@ with open(timeStampsFile, 'r') as f:
         timeStamps.append(double(l[0])*1e-9)
 
 
-slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.MONOCULAR, False)
+slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.MONOCULAR, True)
 imageScale = slam.get_image_scale()
 
 clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
