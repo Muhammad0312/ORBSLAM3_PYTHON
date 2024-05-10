@@ -44,19 +44,19 @@ with open(imuFile, 'r') as f:
         accData.append(orbslam3.Point3f(float(data[4]), float(data[5]), float(data[6])))
         gyroData.append(orbslam3.Point3f(float(data[1]), float(data[2]), float(data[3])))
 
-
+start_idx = 0
 # First Imu measurement which matches the first image timestamp
 firstImu = 0
-while imuTimeStamps[firstImu] <= timeStamps[0]:
+while imuTimeStamps[firstImu] <= timeStamps[start_idx]:
     firstImu += 1
 firstImu -= 1
 
 
-slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.IMU_MONOCULAR, False)
+slam = orbslam3.system(args.vocab_file, args.settings_file, orbslam3.Sensor.IMU_MONOCULAR, True)
 imageScale = slam.get_image_scale()
 
 
-for i in range(len(imgFiles)):
+for i in range(start_idx, len(imgFiles)):
     # print("Processing: ", i)
     vImuMeas = []
     startTime = time.time()
@@ -71,7 +71,7 @@ for i in range(len(imgFiles)):
         height = img.rows * imageScale
         img = cv2.resize(img, (width, height))
 
-    if i > 0:
+    if i - start_idx > 0:
         while imuTimeStamps[firstImu] <= currentTimestamp:
             vImuMeas.append(orbslam3.Point(accData[firstImu].x, accData[firstImu].y, accData[firstImu].z, gyroData[firstImu].x, gyroData[firstImu].y, gyroData[firstImu].z, imuTimeStamps[firstImu]))
             firstImu += 1
